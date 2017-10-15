@@ -2,7 +2,6 @@ const fs = require('fs')
 const argv = require('yargs').argv
 const path = require('path')
 
-
 // const m4a_path = `/Users/ymhtp/Desktop/ToCowom/Ryo\ Fukui`
 // const flac_path = `/Users/ymhtp/Desktop/Ryo\ Fukui`
 
