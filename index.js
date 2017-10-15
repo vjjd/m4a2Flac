@@ -1,34 +1,32 @@
 const ffmpeg = require('fluent-ffmpeg')
 const fs = require('fs')
 const argv = require('yargs').argv
-const fromFormat = 'm4a'
-const regexpFormat = new RegExp(fromFormat)
+const path = require('path')
 
-// const m4a_path = `/Users/ymhtp/Desktop/ToCowom/Ryo\ Fukui`
-// const flac_path = `/Users/ymhtp/Desktop/Ryo\ Fukui`
+const regexpFormat = new RegExp(argv.format)
 
-todo2()
+run()
 
-function todo2(){
-    let albsORsongs = fs.readdirSync(argv.from).filter(f => !(/(^|\/)\.[^\/\.]/g).test(f))
-    let songs = albsORsongs.filter(f => (regexpFormat).test(f))    
-    !songs.length ? pullFromAlbums(albsORsongs.filter(f => !(regexpFormat).test(f))) :
-    convertSongs(songs)
+function run(){
+    let contents = fs.readdirSync(argv.from).filter(f => !(/(^|\/)\.[^\/\.]/g).test(f))
+    let files = contents.filter(f => (regexpFormat).test(path.extname(f)))
+    
+    !files.length ? pullFromAlbums(contents.filter(f => !path.extname(f))) :
+    convertSongs(files)
 }
 
 function pullFromAlbums(albums){
-    console.log('ya tut')
-    albums.map((album)=> {
+    albums.map(album=> {
         fs.readdir(`${argv.from}/${album}`, (err, list)=> {
-            err ? errorHandler(err) :
+            err ? errorHandler(err) : 
             songs = list.filter(s => (regexpFormat).test(s))
             
             fs.mkdirSync(`${argv.to}/${album}`)
 
             console.log(`#Converting ${songs}`)
-            songs.map((file)=> {
+            songs.map(file=> {
                 new ffmpeg(`${argv.from}/${album}/${file}`)
-                .fromFormat(fromFormat)
+                .fromFormat(argv.format)
                 .toFormat('flac')
                 .saveToFile(`${argv.to}/${album}/${file.replace(regexpFormat, 'flac')}`)
                 .on('end', ()=> {
@@ -41,9 +39,9 @@ function pullFromAlbums(albums){
 
 function convertSongs(songs){
     console.log(`#Converting ${songs}`)
-    songs.map((file)=> {
+    songs.map(file=> {
         new ffmpeg(`${argv.from}/${file}`)
-        .fromFormat(fromFormat)
+        .fromFormat(argv.format)
         .toFormat('flac')
         .saveToFile(`${argv.to}/${file.replace(regexpFormat, 'flac')}`)
         .on('end', ()=> {
