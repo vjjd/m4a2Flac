@@ -1,39 +1,55 @@
 const ffmpeg = require('fluent-ffmpeg')
 const fs = require('fs')
 const argv = require('yargs').argv
+const fromFormat = 'm4a'
+const regexpFormat = new RegExp(fromFormat)
 
 // const m4a_path = `/Users/ymhtp/Desktop/ToCowom/Ryo\ Fukui`
 // const flac_path = `/Users/ymhtp/Desktop/Ryo\ Fukui`
 
+todo2()
 
-run()
+function todo2(){
+    let albsORsongs = fs.readdirSync(argv.from).filter(f => !(/(^|\/)\.[^\/\.]/g).test(f))
+    let songs = albsORsongs.filter(f => (regexpFormat).test(f))    
+    !songs.length ? pullFromAlbums(albsORsongs.filter(f => !(regexpFormat).test(f))) :
+    convertSongs(songs)
+}
 
-function run(){
-    fs.readdir(argv.from, (err, list) => {
-        err ? errorHandler(err) :
-        albums = list.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item))
-        console.log(albums)
-    
-        albums.map((album)=> {
-            fs.readdir(`${argv.from}/${album}`, (err, list)=> {
-                err ? errorHandler(err) :
-                files = list.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item))
-                console.log(files)
-                
-                fs.mkdirSync(`${argv.to}/${album}`)
+function pullFromAlbums(albums){
+    console.log('ya tut')
+    albums.map((album)=> {
+        fs.readdir(`${argv.from}/${album}`, (err, list)=> {
+            err ? errorHandler(err) :
+            songs = list.filter(s => (regexpFormat).test(s))
+            
+            fs.mkdirSync(`${argv.to}/${album}`)
 
-                files.map((file)=> {
-                    new ffmpeg(`${argv.from}/${album}/${file}`)
-                    .fromFormat('m4a')
-                    .toFormat('flac')
-                    .saveToFile(`${argv.to}/${album}/${file.replace(/m4a/, 'flac')}`)
-                    .on('end', ()=> {
-                        console.log(`End: ${file}`);
-                    })
-                })  
+            console.log(`#Converting ${songs}`)
+            songs.map((file)=> {
+                new ffmpeg(`${argv.from}/${album}/${file}`)
+                .fromFormat(fromFormat)
+                .toFormat('flac')
+                .saveToFile(`${argv.to}/${album}/${file.replace(regexpFormat, 'flac')}`)
+                .on('end', ()=> {
+                    console.log(`End: ${file}`);
+                })
             })
         })
-      });
+    })
+}
+
+function convertSongs(songs){
+    console.log(`#Converting ${songs}`)
+    songs.map((file)=> {
+        new ffmpeg(`${argv.from}/${file}`)
+        .fromFormat(fromFormat)
+        .toFormat('flac')
+        .saveToFile(`${argv.to}/${file.replace(regexpFormat, 'flac')}`)
+        .on('end', ()=> {
+            console.log(`End: ${file}`);
+        })
+    })  
 }
 
   function errorHandler(err){
