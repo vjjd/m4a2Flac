@@ -2,7 +2,7 @@
   "editor.formatOnSave": true,
   "prettier.trailingComma": "es5",
   "prettier.tabWidth": 2,
-  "prettier.printWidth": 85,
+  "prettier.printWidth": 80,
   "prettier.semi": false,
   "prettier.singleQuote": true,
   "workbench.startupEditor": "newUntitledFile",

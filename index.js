@@ -2,13 +2,17 @@ const ffmpeg = require('fluent-ffmpeg')
 const fs = require('fs')
 const argv = require('yargs').argv
 const path = require('path')
-
+const yargs = require('yargs')(['--info']).usage(
+  'node index.js --from="path to music folder" --to="path to outcome" --format="m4a or ape"'
+)
 const regexpFormat = new RegExp(argv.format)
 
-run()
+!argv.to || !argv.from || !argv.format ? yargs.help('info').argv : run()
 
 function run() {
-  let contents = fs.readdirSync(argv.from).filter(f => !/(^|\/)\.[^\/\.]/g.test(f))
+  let contents = fs
+    .readdirSync(argv.from)
+    .filter(f => !/(^|\/)\.[^\/\.]/g.test(f))
   let files = contents.filter(f => regexpFormat.test(path.extname(f)))
 
   !files.length
@@ -29,7 +33,9 @@ function pullFromAlbums(albums) {
         new ffmpeg(`${argv.from}/${album}/${file}`)
           .fromFormat(argv.format)
           .toFormat('flac')
-          .saveToFile(`${argv.to}/${album}/${file.replace(regexpFormat, 'flac')}`)
+          .saveToFile(
+            `${argv.to}/${album}/${file.replace(regexpFormat, 'flac')}`
+          )
           .on('end', () => {
             console.log(`End: ${file}`)
           })
