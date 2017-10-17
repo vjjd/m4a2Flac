@@ -2,14 +2,17 @@ const ffmpeg = require('fluent-ffmpeg')
 const fs = require('fs')
 const argv = require('yargs').argv
 const path = require('path')
+const regexpFormat = new RegExp(argv.format)
 const yargs = require('yargs')(['--info']).usage(
   'node index.js --from="path to music folder" --to="path to outcome" --format="m4a or ape"'
 )
-const regexpFormat = new RegExp(argv.format)
 
-!argv.to || !argv.from || !argv.format ? yargs.help('info').argv : run()
+!argv.to || !argv.from || !argv.format ? yargs.help('info').argv : sortContent()
 
-function run() {
+/**
+ * Sort content into songs or albums
+ */
+function sortContent() {
   let contents = fs
     .readdirSync(argv.from)
     .filter(f => !/(^|\/)\.[^\/\.]/g.test(f))
@@ -20,6 +23,10 @@ function run() {
     : convertSongs(files)
 }
 
+/**
+ * Convert songs from albums
+ * @param {*array} albums
+ */
 function pullFromAlbums(albums) {
   albums.map(album => {
     fs.readdir(`${argv.from}/${album}`, (err, list) => {
@@ -44,6 +51,10 @@ function pullFromAlbums(albums) {
   })
 }
 
+/**
+ * Converting songs without albums
+ * @param {*array} songs 
+ */
 function convertSongs(songs) {
   console.log(`#Converting ${songs}`)
   songs.map(file => {
@@ -57,6 +68,10 @@ function convertSongs(songs) {
   })
 }
 
+/**
+ * 
+ * @param {*error} err 
+ */
 function errorHandler(err) {
   console.log(`Error: ${err}`)
 }
