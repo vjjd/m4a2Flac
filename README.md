@@ -1,5 +1,5 @@
 # m4a2flac
-Скрпит для конвертирования loseless форматов во .flac основанный на fluent-ffmpeg библиотеке
+Скрпит для конвертирования lossless форматов во .flac основанный на fluent-ffmpeg библиотеке
 
 ## Installation
 Для работы требуется ```git```, [```node```](https://nodejs.org), [```ffmpeg```](http://www.ffmpeg.org).
